@@ -28,10 +28,19 @@ public class Receiver implements Runnable {
 
                 if (isNickFree(message) && getNickFromMsg(message).equals(nick)) {
                     sender.send("NICK " + nick + " BUSY");
-                } else if (isMsg(message) && messageRoom(message).equals(room)) {
+                } else if (isMsg(message) && messageRoom(message).equals(room) && !getNickFromMsg(message).equals(nick)) {
                     System.out.println(messageAuthor(message) + ": " + message(message));
-                } else if (isJoinInformation(message) && getRoom(message).equals(room)) {
-                    System.out.println(getJoined(message) + " joined");
+                } else if (isJoinInformation(message) && getRoom(message).equals(room) && !getJoined(message).equals(nick)) {
+                    System.out.println(getJoined(message) + " joined to this room");
+                } else if (isLeave(message) && getRoom(message).equals(room) && !message.split(" ")[2].equals(nick)) {
+                    System.out.println(message.split(" ")[2] + " left the room");
+                    if (message.split(" ")[2].equals(nick)) {
+                        room = null;
+                    }
+                } else if (isUserChangingRoom(message) && message.split(" ")[2].equals(nick)) {
+                    room = getRoom(message);
+                    sender.send("JOIN " + room + " " + nick);
+                    System.out.println("Welcome in " + room + ". Let's talk!");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -46,7 +55,7 @@ public class Receiver implements Runnable {
     public void setRoom(String room) {
         this.room = room;
     }
-    
+
     private boolean isNickFree(String message) {
         return message.substring(0, 4).equals("NICK") && !message.substring(message.length() - 4).equals("BUSY");
     }
@@ -91,4 +100,13 @@ public class Receiver implements Runnable {
     public static String getNickFromMsg(String message) {
         return message.split(" ")[1];
     }
+
+    private boolean isLeave(String message) {
+        return message.substring(0, 5).equals("LEAVE");
+    }
+
+    private boolean isUserChangingRoom(String message) {
+        return message.substring(0, 7).equals("SETROOM");
+    }
+
 }

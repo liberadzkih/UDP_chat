@@ -41,7 +41,8 @@ public class Chat {
         msgSender.setNick(nick);
         socket.setSoTimeout(0);
 
-        System.out.println("Welcome in room " + room + ". Let's talk!.");
+        System.out.println("Welcome in " + room + ". Let's talk!");
+        System.out.println("Type !leave to leave the room");
 
         Thread receiverThread = new Thread(receiver);
         Thread senderThread = new Thread(msgSender);

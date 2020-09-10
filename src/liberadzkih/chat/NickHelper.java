@@ -20,7 +20,7 @@ public class NickHelper {
     }
 
     public static boolean isNickCorrect(MulticastSocket socket, Sender sender, String nick) {
-        sender.send("NICK " + nick); //NICK nickname
+        sender.send("NICK " + nick);
         byte[] buffer = new byte[("NICK " + nick + " BUSY").getBytes().length];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
