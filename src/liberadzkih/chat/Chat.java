@@ -13,6 +13,16 @@ public class Chat {
     private Receiver receiver;
     private MsgSender msgSender;
 
+    // TODO: Funkcjonalność na ocenę 5 
+    // b) program powinien oferować możliwość wyświetlania informacji o tym, kto w danej chwili jest dołączony do pokoju,
+    // c) w tym celu po otrzymaniu od swojego użytkownika takiej dyspozycji powinien wysłać do grupy
+    // komunikat w postać (WHOIS room), gdzie room, to nazwa pokoju, do którego jest przyłączony użytkownik,
+    // d) każdy z programów (włączając to program użytkownika, o którym mowa w punkcie (b))
+    // po otrzymaniu komunikatu WHOIS analizuje go i w przypadku, gdy jego użytkownik o nazwie nick
+    // jest w danym pokoju room, wysyła na grupę komunikat w postaci (ROOM room nick),
+    // e) program, o którym mowa w punkcie (b) odbiera wszystkie komunikaty ROOM i wyświetla
+    // swojemu użytkownikowi zbiorczą informację o tym, kto jest przyłączony do jego pokoju.
+
     public Chat(int port, InetAddress address) {
         try {
             this.socket = new MulticastSocket(port);
@@ -31,12 +41,12 @@ public class Chat {
         System.out.println("~~~~~~~~~~~ CHAT STARTED ~~~~~~~~~~~");
         String nick = NickHelper.getNick(socket, sender);
         String room = setRoom();
-        
+
         sender.send("JOIN " + room + " " + nick);
-        
+
         receiver.setNick(nick);
         receiver.setRoom(room);
-        
+
         msgSender.setRoom(room);
         msgSender.setNick(nick);
         socket.setSoTimeout(0);
@@ -50,8 +60,8 @@ public class Chat {
         receiverThread.start();
         senderThread.start();
     }
-    
-    private String setRoom(){
+
+    private String setRoom() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Select room: room1 (1), room2 (2), room3 (3)");
         System.out.print("Your choice(1, 2 or 3): ");
