@@ -39,7 +39,6 @@ public class MsgSender implements Runnable {
         System.out.println("Select room: room1 (1), room2 (2), room3 (3)");
         System.out.print("Your choice(1, 2 or 3): ");
         String input = scanner.nextLine();
-        System.out.println("@"+input+"@");
         switch (Integer.parseInt(input)) {
             case 1:
                 sender.send("SETROOM room1 " + nick);

@@ -32,10 +32,11 @@ public class Receiver implements Runnable {
                     System.out.println(messageAuthor(message) + ": " + message(message));
                 } else if (isJoinInformation(message) && getRoom(message).equals(room) && !getJoined(message).equals(nick)) {
                     System.out.println(getJoined(message) + " joined to this room");
-                } else if (isLeave(message) && getRoom(message).equals(room) && !message.split(" ")[2].equals(nick)) {
-                    System.out.println(message.split(" ")[2] + " left the room");
+                } else if (isLeave(message) && getRoom(message).equals(room)) {
                     if (message.split(" ")[2].equals(nick)) {
                         room = null;
+                    } else {
+                        System.out.println(message.split(" ")[2] + " left the room");
                     }
                 } else if (isUserChangingRoom(message) && message.split(" ")[2].equals(nick)) {
                     room = getRoom(message);
