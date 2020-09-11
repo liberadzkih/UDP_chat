@@ -25,28 +25,62 @@ public class Receiver implements Runnable {
                 socket.receive(packet);
 
                 String message = new String(packet.getData(), 0, packet.getLength());
+                //NICK nickname
+                //NICK nickname BUSY
+                //JOIN ROOM NICK
+                //MSG ROOM NICK msg
+                //SETROOM ROOM NICK
+                //LEAVE ROOM NICK
+                //WHOIS ROOM NICK
+                String header = message.split(" ")[0];
+                switch (header) {
+                    case "NICK":
+                        if (message.split(" ")[1].equals(nick) && !message.substring(message.length() - 4).equals("BUSY")) {
+                            sender.send("NICK " + nick + " BUSY");
+                        }
+                        break;
+                    case "JOIN":
+                        if (getRoomFromPacket(message).equals(room) && !getNickFromPacket(message).equals(nick)) {
+                            System.out.println(getNickFromPacket(message) + " joined to this room");
+                        }
+                        break;
+                    case "MSG":
+                        if (getRoomFromPacket(message).equals(room) && !getNickFromPacket(message).equals(nick)) {
+                            System.out.println(getNickFromPacket(message) + ": " + message(message));
+                        }
+                        break;
+                    case "LEAVE":
+                        if (getRoomFromPacket(message).equals(room)) {
+                            if (getNickFromPacket(message).equals(nick)) {
+                                room = null;
+                            } else {
+                                System.out.println(getNickFromPacket(message) + " left the room");
+                            }
+                        }
+                        break;
+                    case "SETROOM":
+                        if (getNickFromPacket(message).equals(nick)) {
+                            room = getRoomFromPacket(message);
+                            sender.send("JOIN " + room + " " + nick);
+                            System.out.println("Welcome in " + room + ". Let's talk!");
+                        }
+                        break;
+                    case "WHOIS":
+                        break;
 
-                if (isNickFree(message) && getNickFromMsg(message).equals(nick)) {
-                    sender.send("NICK " + nick + " BUSY");
-                } else if (isMsg(message) && messageRoom(message).equals(room) && !getNickFromMsg(message).equals(nick)) {
-                    System.out.println(messageAuthor(message) + ": " + message(message));
-                } else if (isJoinInformation(message) && getRoom(message).equals(room) && !getJoined(message).equals(nick)) {
-                    System.out.println(getJoined(message) + " joined to this room");
-                } else if (isLeave(message) && getRoom(message).equals(room)) {
-                    if (message.split(" ")[2].equals(nick)) {
-                        room = null;
-                    } else {
-                        System.out.println(message.split(" ")[2] + " left the room");
-                    }
-                } else if (isUserChangingRoom(message) && message.split(" ")[2].equals(nick)) {
-                    room = getRoom(message);
-                    sender.send("JOIN " + room + " " + nick);
-                    System.out.println("Welcome in " + room + ". Let's talk!");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private String getRoomFromPacket(String message) {
+        return message.split(" ")[1];
+    }
+
+    private String getNickFromPacket(String message) {
+        return message.split(" ")[2];
     }
 
     public void setNick(String nick) {
@@ -57,32 +91,8 @@ public class Receiver implements Runnable {
         this.room = room;
     }
 
-    private boolean isNickFree(String message) {
-        return message.substring(0, 4).equals("NICK") && !message.substring(message.length() - 4).equals("BUSY");
-    }
-
     public static boolean isNickBusy(String message) {
         return message.substring(message.length() - 4).equals("BUSY");
-    }
-
-    private boolean isMsg(String message) {
-        return message.substring(0, 3).equals("MSG");
-    }
-
-    private boolean isJoinInformation(String message) {
-        return message.substring(0, 4).equals("JOIN");
-    }
-
-    private String getJoined(String message) {
-        return message.split(" ")[2];
-    }
-
-    private String getRoom(String message) {
-        return message.split(" ")[1];
-    }
-
-    private String messageAuthor(String message) {
-        return message.split(" ")[1];
     }
 
     private String message(String message) {
@@ -94,20 +104,8 @@ public class Receiver implements Runnable {
         return msg;
     }
 
-    private String messageRoom(String message) {
-        return message.split(" ")[2];
-    }
-
     public static String getNickFromMsg(String message) {
         return message.split(" ")[1];
-    }
-
-    private boolean isLeave(String message) {
-        return message.substring(0, 5).equals("LEAVE");
-    }
-
-    private boolean isUserChangingRoom(String message) {
-        return message.substring(0, 7).equals("SETROOM");
     }
 
 }

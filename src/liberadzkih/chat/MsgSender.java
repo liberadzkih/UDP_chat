@@ -29,7 +29,7 @@ public class MsgSender implements Runnable {
                 sender.send("LEAVE " + room + " " + nick);
                 setRoom();
             } else if (msg.length() > 0) {
-                sender.send("MSG " + nick + " " + room + " " + msg);
+                sender.send("MSG " + room + " " + nick + " " + msg);
             }
         }
     }
