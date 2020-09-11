@@ -3,6 +3,7 @@ package liberadzkih.chat;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
+import java.util.ArrayList;
 
 public class Receiver implements Runnable {
 
@@ -32,6 +33,7 @@ public class Receiver implements Runnable {
                 //SETROOM ROOM NICK
                 //LEAVE ROOM NICK
                 //WHOIS ROOM NICK
+                //ROOM ROOM NICK target_user
                 String header = message.split(" ")[0];
                 switch (header) {
                     case "NICK":
@@ -66,6 +68,17 @@ public class Receiver implements Runnable {
                         }
                         break;
                     case "WHOIS":
+                        if (getNickFromPacket(message).equals(nick)) {
+                            System.out.print("Users online in " + getRoomFromPacket(message) + ": " + nick + " ");
+                        }
+                        if(!getNickFromPacket(message).equals(nick) && getRoomFromPacket(message).equals(room)){
+                            sender.send("ROOM " + room + " " + nick + " " + getNickFromPacket(message));
+                        }
+                        break;
+                    case "ROOM":
+                        if(getRoomFromPacket(message).equals(room) && message.split(" ")[3].equals(nick)){
+                            System.out.print(getNickFromPacket(message) + " ");
+                        }
                         break;
 
                 }
@@ -75,14 +88,6 @@ public class Receiver implements Runnable {
         }
     }
 
-    private String getRoomFromPacket(String message) {
-        return message.split(" ")[1];
-    }
-
-    private String getNickFromPacket(String message) {
-        return message.split(" ")[2];
-    }
-
     public void setNick(String nick) {
         this.nick = nick;
     }
@@ -90,9 +95,13 @@ public class Receiver implements Runnable {
     public void setRoom(String room) {
         this.room = room;
     }
+    
+    private String getRoomFromPacket(String message) {
+        return message.split(" ")[1];
+    }
 
-    public static boolean isNickBusy(String message) {
-        return message.substring(message.length() - 4).equals("BUSY");
+    private String getNickFromPacket(String message) {
+        return message.split(" ")[2];
     }
 
     private String message(String message) {
@@ -102,10 +111,6 @@ public class Receiver implements Runnable {
             msg += data[i] + " ";
         }
         return msg;
-    }
-
-    public static String getNickFromMsg(String message) {
-        return message.split(" ")[1];
     }
 
 }

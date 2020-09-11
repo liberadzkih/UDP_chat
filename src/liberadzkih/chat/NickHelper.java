@@ -31,7 +31,7 @@ public class NickHelper {
                 socket.setSoTimeout(5000);
                 socket.receive(packet);
                 String response = new String(packet.getData(), 0, packet.getLength());
-                if (Receiver.isNickBusy(response) && Receiver.getNickFromMsg(response).equals(nick)) {
+                if (isNickBusy(response) && response.split(" ")[1].equals(nick)) {
                     System.out.println("Nick is busy");
                     return false;
                 }
@@ -43,6 +43,10 @@ public class NickHelper {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    private static boolean isNickBusy(String msg){
+        return msg.substring(msg.length() - 4).equals("BUSY");
     }
 
 }

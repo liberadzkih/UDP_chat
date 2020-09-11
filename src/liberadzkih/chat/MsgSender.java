@@ -28,13 +28,15 @@ public class MsgSender implements Runnable {
                 System.out.println("You've left the room");
                 sender.send("LEAVE " + room + " " + nick);
                 setRoom();
+            } else if (msg.equals("!users")) {
+                sender.send("WHOIS " + room + " " + nick);
             } else if (msg.length() > 0) {
                 sender.send("MSG " + room + " " + nick + " " + msg);
             }
         }
     }
 
-    private void setRoom(){
+    private void setRoom() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Select room: room1 (1), room2 (2), room3 (3)");
         System.out.print("Your choice(1, 2 or 3): ");
